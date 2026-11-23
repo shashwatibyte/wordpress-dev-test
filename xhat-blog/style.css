@@ -1,0 +1,1112 @@
+/*
+Theme Name:         Xhat Blog
+Theme URI:          https://xhat.com/
+Author:             Xhat
+Author URI:         https://xhat.com/
+Description:        The official blog theme for Xhat — private, unrestricted AI chat. Matches the dark xhat.com branding with a responsive blog listing, sidebar, single post template and native WordPress post management.
+Version:            1.0.0
+Requires at least:  6.0
+Tested up to:       6.8
+Requires PHP:       7.4
+License:            GNU General Public License v2 or later
+License URI:        http://www.gnu.org/licenses/gpl-2.0.html
+Text Domain:        xhat-blog
+Tags:               blog, dark, two-columns, right-sidebar, custom-menu, custom-logo, featured-images, translation-ready
+*/
+
+/* =========================================================================
+   1. Design tokens  (sampled from xhat.com)
+   ========================================================================= */
+:root {
+	color-scheme: dark;
+
+	/* Brand mint — the accent used across xhat.com */
+	--xhat-accent:       #00ffc6;
+	--xhat-accent-dark:  #00e0ad;
+	--xhat-accent-soft:  rgba(0, 255, 198, .10);
+
+	/* Text on a mint background is dark, never white. */
+	--xhat-on-accent:    #04140f;
+
+	--xhat-ink:          #f2f5f4;
+	--xhat-heading:      #ffffff;
+	--xhat-body:         #b2bab8;
+	--xhat-muted:        #8c9693;
+	--xhat-faint:        #6d7472;
+
+	--xhat-border:       #1f2523;
+	--xhat-border-soft:  #171c1b;
+
+	--xhat-bg:           #0a0a0a;
+	--xhat-bg-soft:      #111413;
+	--xhat-surface:      #101312;
+	--xhat-dark:         #050605;
+
+	--xhat-font: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+		"Helvetica Neue", Arial, sans-serif;
+
+	--xhat-radius-sm: 8px;
+	--xhat-radius:    12px;
+	--xhat-radius-lg: 16px;
+	--xhat-radius-xl: 24px;
+	--xhat-radius-pill: 999px;
+
+	--xhat-shadow-sm: 0 1px 2px rgba(0, 0, 0, .40);
+	--xhat-shadow:    0 4px 16px rgba(0, 0, 0, .50);
+	--xhat-shadow-lg: 0 16px 40px rgba(0, 0, 0, .60);
+
+	--xhat-header-h: 64px;
+}
+
+/* =========================================================================
+   2. Reset / base
+   ========================================================================= */
+*, *::before, *::after { box-sizing: border-box; }
+
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+
+body {
+	margin: 0;
+	background: var(--xhat-bg);
+	color: var(--xhat-body);
+	font-family: var(--xhat-font);
+	font-size: 16px;
+	line-height: 1.65;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+	margin: 0 0 .5em;
+	color: var(--xhat-heading);
+	font-weight: 700;
+	line-height: 1.25;
+	letter-spacing: -.01em;
+}
+
+h1 { font-size: clamp(1.625rem, 1.1rem + 2.2vw, 2.5rem); }
+h2 { font-size: clamp(1.375rem, 1rem + 1.6vw, 1.875rem); }
+h3 { font-size: clamp(1.125rem, .95rem + .9vw, 1.5rem); }
+h4 { font-size: 1.125rem; }
+
+p { margin: 0 0 1.15rem; }
+
+a { color: var(--xhat-accent); text-decoration: none; transition: color .2s ease; }
+a:hover, a:focus { color: var(--xhat-accent-dark); }
+
+img, svg, video, iframe { max-width: 100%; height: auto; display: block; }
+
+ul, ol { margin: 0 0 1.15rem; padding-left: 1.25rem; }
+
+blockquote {
+	margin: 1.75rem 0;
+	padding: 1rem 0 1rem 1.5rem;
+	border-left: 4px solid var(--xhat-accent);
+	background: var(--xhat-bg-soft);
+	border-radius: 0 var(--xhat-radius) var(--xhat-radius) 0;
+	color: var(--xhat-ink);
+	font-size: 1.0625rem;
+	font-style: italic;
+}
+blockquote p:last-child { margin-bottom: 0; }
+blockquote cite { display: block; margin-top: .5rem; color: var(--xhat-muted); font-size: .875rem; font-style: normal; }
+
+code, kbd, pre, samp { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; font-size: .9em; }
+code { padding: .15em .4em; background: var(--xhat-bg-soft); border: 1px solid var(--xhat-border); border-radius: 6px; color: var(--xhat-ink); }
+pre {
+	margin: 1.5rem 0; padding: 1.25rem; overflow-x: auto;
+	background: var(--xhat-dark); color: #e8eaed;
+	border-radius: var(--xhat-radius); line-height: 1.6;
+}
+pre code { padding: 0; background: none; border: 0; color: inherit; }
+
+table { width: 100%; margin: 1.5rem 0; border-collapse: collapse; font-size: .9375rem; }
+th, td { padding: .75rem 1rem; border: 1px solid var(--xhat-border); text-align: left; }
+th { background: var(--xhat-bg-soft); color: var(--xhat-heading); font-weight: 600; }
+
+hr { margin: 2.5rem 0; border: 0; border-top: 1px solid var(--xhat-border); }
+
+figure { margin: 1.75rem 0; }
+figcaption { margin-top: .6rem; color: var(--xhat-muted); font-size: .8125rem; text-align: center; }
+
+:focus-visible { outline: 2px solid var(--xhat-accent); outline-offset: 2px; border-radius: 4px; }
+
+/* =========================================================================
+   3. Layout helpers
+   ========================================================================= */
+.xhat-container {
+	width: 100%;
+	max-width: min(1440px, 89.58%);  /* matches live site .custom-container */
+	margin-inline: auto;
+}
+.xhat-container--narrow  { max-width: min(1120px, 89.58%); }
+.xhat-container--reading { max-width: min(1110px, 89.58%); }
+
+.xhat-section      { padding: 2.75rem 0; }
+.xhat-section--alt { background: var(--xhat-bg-soft); }
+
+.screen-reader-text {
+	position: absolute !important;
+	width: 1px; height: 1px; padding: 0; margin: -1px;
+	overflow: hidden; clip: rect(0 0 0 0); clip-path: inset(50%);
+	white-space: nowrap; border: 0;
+}
+.screen-reader-text:focus {
+	position: static !important;
+	width: auto; height: auto; margin: 0; clip: auto; clip-path: none;
+	padding: .75rem 1.25rem; background: var(--xhat-surface); color: var(--xhat-accent);
+	font-weight: 600; z-index: 100000;
+}
+
+.skip-link {
+	position: absolute; top: -100px; left: 1rem; z-index: 100000;
+	padding: .75rem 1.25rem; background: var(--xhat-surface); color: var(--xhat-accent);
+	border-radius: var(--xhat-radius-sm); box-shadow: var(--xhat-shadow);
+	font-weight: 600;
+}
+.skip-link:focus { top: 1rem; }
+
+/* =========================================================================
+   4. Eyebrow / kicker  (mint ring + dot, as on the live site)
+   ========================================================================= */
+.xhat-eyebrow {
+	display: inline-flex; align-items: center; gap: .75rem;
+	margin-bottom: 1rem;
+	color: var(--xhat-ink);
+	font-size: .9375rem; font-weight: 600;
+}
+.xhat-eyebrow::before {
+	content: "";
+	flex: 0 0 auto;
+	width: 22px; height: 22px;
+	border: 2px solid var(--xhat-accent);
+	border-radius: 50%;
+	background: radial-gradient(circle, var(--xhat-accent) 0 4px, transparent 4px);
+}
+
+.xhat-accent { color: var(--xhat-accent); }
+
+/* =========================================================================
+   5. Buttons
+   ========================================================================= */
+.xhat-btn {
+	display: inline-flex; align-items: center; justify-content: center; gap: .5rem;
+	padding: .75rem 1.75rem;
+	border: 1px solid transparent;
+	border-radius: var(--xhat-radius-pill);
+	background: var(--xhat-accent);
+	color: var(--xhat-on-accent);
+	font-family: inherit; font-size: .9375rem; font-weight: 600; line-height: 1.2;
+	text-align: center; cursor: pointer;
+	transition: background .2s ease, transform .2s ease, box-shadow .2s ease;
+}
+.xhat-btn:hover, .xhat-btn:focus { background: var(--xhat-accent-dark); color: var(--xhat-on-accent); transform: translateY(-1px); box-shadow: var(--xhat-shadow); }
+.xhat-btn svg { width: 1em; height: 1em; }
+
+.xhat-btn--ghost { background: transparent; color: var(--xhat-ink); border-color: var(--xhat-border); }
+.xhat-btn--ghost:hover, .xhat-btn--ghost:focus { background: var(--xhat-bg-soft); color: var(--xhat-accent); border-color: var(--xhat-accent); }
+
+.xhat-btn--sm { padding: .5rem 1.25rem; font-size: .875rem; }
+
+/* =========================================================================
+   6. Header  (mirrors the live xhat.com header)
+   ========================================================================= */
+.xhat-header {
+	position: sticky; top: 0; z-index: 50;
+	background: rgba(10, 10, 10, .88); backdrop-filter: saturate(140%) blur(12px);
+	border-bottom: 1px solid var(--xhat-border);
+	box-shadow: 0 1px 2px rgba(0, 0, 0, .05);
+	transition: all .3s ease;
+}
+
+.xhat-header__inner {
+	display: flex; align-items: center; justify-content: space-between;
+	gap: 1rem;
+	padding: .25rem 0;                            /* py-1 */
+}
+@media (min-width: 768px) {
+	.xhat-header__inner { padding: .75rem 0; }     /* md:py-3 */
+}
+
+/* --- left group: logo + nav (gap-15 = 3.75rem) --- */
+.xhat-header__left { display: flex; align-items: center; gap: 1.5rem; min-width: 0; }
+@media (min-width: 1024px) { .xhat-header__left { gap: 3.75rem; } }
+
+.xhat-branding { display: flex; align-items: center; flex: 0 0 auto; }
+.xhat-branding a { display: inline-flex; align-items: center; gap: .5rem; transition: transform .3s ease; }
+.xhat-branding img,
+.xhat-branding .custom-logo {
+	height: 40px; width: auto;
+	max-width: 6rem;
+	object-fit: contain;
+}
+@media (min-width: 768px) {
+	.xhat-branding img,
+	.xhat-branding .custom-logo { max-width: 8rem; }
+}
+
+.xhat-site-title { margin: 0; color: var(--xhat-ink); font-size: 1.125rem; font-weight: 800; letter-spacing: -.02em; }
+.xhat-site-title a { color: inherit; }
+.xhat-site-title a:hover { color: var(--xhat-accent); }
+
+/* --- primary nav (desktop only, from lg = 1024px) --- */
+.xhat-nav { display: none; }
+@media (min-width: 1024px) { .xhat-nav { display: flex; align-items: center; } }
+
+.xhat-nav__list {
+	display: flex; align-items: center; gap: 1.5rem;   /* gap-6 */
+	margin: 0; padding: 0; list-style: none;
+}
+.xhat-nav__list > li { position: relative; }
+
+.xhat-nav__list > li > a,
+.xhat-nav__toggle {
+	display: inline-flex; align-items: center; gap: .25rem;
+	padding: 0;
+	background: none; border: 0;
+	color: var(--xhat-ink);
+	font-family: inherit; font-size: 1rem; font-weight: 700; line-height: 1.5;
+	white-space: nowrap; cursor: pointer;
+	transition: color .3s ease;
+}
+.xhat-nav__list > li > a:hover,
+.xhat-nav__list > li > a:focus,
+.xhat-nav__toggle:hover,
+.xhat-nav__toggle:focus { color: var(--xhat-accent); }
+
+.xhat-nav__list .current-menu-item > a,
+.xhat-nav__list .current_page_item > a,
+.xhat-nav__list .current-menu-ancestor > a,
+.xhat-nav__list .current-menu-ancestor > .xhat-nav__toggle { color: var(--xhat-accent); }
+
+.xhat-nav__toggle svg { width: 16px; height: 16px; transition: transform .2s ease; }
+.xhat-nav__toggle[aria-expanded="true"] svg { transform: rotate(180deg); }
+
+/* --- About Us dropdown --- */
+.xhat-nav__list .sub-menu {
+	position: absolute; top: 100%; left: 50%; z-index: 50;
+	transform: translateX(-50%);
+	width: 14rem;                                 /* w-56 */
+	margin: .75rem 0 0; padding: 0;
+	list-style: none;
+	background: var(--xhat-surface);
+	border: 1px solid var(--xhat-border);
+	border-radius: 12px;                          /* rounded-xl */
+	box-shadow: 0 20px 25px -5px rgba(0, 0, 0, .1), 0 8px 10px -6px rgba(0, 0, 0, .1);
+}
+.xhat-nav__list .sub-menu[hidden] { display: none; }
+
+/* Round the hover highlight to match the panel (no overflow:hidden here,
+   it would clip the arrow below). */
+.xhat-nav__list .sub-menu li:first-child a { border-radius: 11px 11px 0 0; }
+.xhat-nav__list .sub-menu li:last-child  a { border-radius: 0 0 11px 11px; }
+
+/* little arrow above the panel */
+.xhat-nav__list > li > .sub-menu::before {
+	content: "";
+	position: absolute; top: -7px; left: 50%;
+	width: 12px; height: 12px;
+	margin-left: -6px;
+	background: var(--xhat-surface);
+	border-top: 1px solid var(--xhat-border);
+	border-left: 1px solid var(--xhat-border);
+	border-top-left-radius: 2px;
+	transform: rotate(45deg);
+}
+
+.xhat-nav__list .sub-menu li + li { border-top: 1px solid var(--xhat-border-soft); }
+
+.xhat-nav__list .sub-menu a {
+	display: flex; align-items: center; gap: .75rem;
+	padding: .875rem 1rem;
+	color: inherit;
+	transition: background-color .15s ease;
+}
+.xhat-nav__list .sub-menu a:hover,
+.xhat-nav__list .sub-menu a:focus { background: var(--xhat-accent-soft); }
+
+.xhat-nav__subicon {
+	flex: 0 0 auto;
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 32px; height: 32px;
+	background: var(--xhat-accent-soft);
+	border-radius: 8px;
+	color: var(--xhat-accent);
+	transition: background-color .15s ease, color .15s ease;
+}
+.xhat-nav__subicon svg { width: 16px; height: 16px; }
+.xhat-nav__list .sub-menu a:hover .xhat-nav__subicon { background: var(--xhat-accent); color: var(--xhat-on-accent); }
+
+.xhat-nav__sublabel { display: flex; flex-direction: column; min-width: 0; }
+.xhat-nav__subtitle { color: var(--xhat-ink); font-size: .875rem; font-weight: 600; transition: color .15s ease; }
+.xhat-nav__subdesc  { margin-top: .125rem; color: var(--xhat-muted); font-size: .75rem; }
+.xhat-nav__list .sub-menu a:hover .xhat-nav__subtitle { color: var(--xhat-accent); }
+
+/* --- right-hand actions --- */
+.xhat-header__actions { display: flex; align-items: center; gap: .75rem; flex: 0 0 auto; }
+
+.xhat-header__addlink {
+	display: none;
+	align-items: center; gap: .25rem;
+	padding: .5rem 0;
+	color: var(--xhat-accent);
+	font-weight: 700;
+	transition: color .3s ease;
+}
+@media (min-width: 1024px) { .xhat-header__addlink { display: inline-flex; } }
+
+.xhat-header__login {
+	display: inline-flex; align-items: center;
+	padding: .5rem 1rem;
+	color: var(--xhat-ink);
+	font-weight: 700;
+	transition: color .3s ease;
+}
+.xhat-header__login:hover, .xhat-header__login:focus { color: var(--xhat-accent); }
+
+.xhat-header__signup {
+	display: none;
+	align-items: center; justify-content: center;
+	padding: .5rem 1rem;
+	background: var(--xhat-accent);
+	border-radius: var(--xhat-radius-pill);
+	color: var(--xhat-on-accent);
+	line-height:24px;
+	transition: background-color .3s ease, transform .3s ease;
+}
+@media (min-width: 1024px) { .xhat-header__signup { display: inline-flex; } }
+.xhat-header__signup:hover,
+.xhat-header__signup:focus { background: var(--xhat-accent-dark); color: var(--xhat-on-accent); transform: scale(1.05); }
+
+/* --- burger (below lg) --- */
+.xhat-burger {
+	display: inline-flex; align-items: center; justify-content: center;
+	padding: 0;
+	background: none; border: 0; border-radius: 8px;
+	color: var(--xhat-ink); cursor: pointer;
+	transition: background-color .2s ease;
+}
+.xhat-burger svg { width: 32px; height: 32px; }
+.xhat-burger:hover { background: rgba(255, 255, 255, .06); }
+@media (min-width: 1024px) { .xhat-burger { display: none; } }
+
+/* --- mobile dropdown panel --- */
+.xhat-mobile-menu {
+	position: absolute; top: 100%; left: 0; z-index: 50;
+	width: 100%;
+	background: var(--xhat-surface);
+	border-top: 1px solid var(--xhat-border);
+	box-shadow: 0 10px 15px -3px rgba(0, 0, 0, .1), 0 4px 6px -4px rgba(0, 0, 0, .1);
+}
+.xhat-mobile-menu[hidden] { display: none; }
+@media (min-width: 1024px) { .xhat-mobile-menu { display: none !important; } }
+
+.xhat-mobile-menu__inner { display: flex; flex-direction: column; gap: .5rem; padding: .5rem; }
+@media (min-width: 768px) { .xhat-mobile-menu__inner { gap: 1rem; padding: 1rem; } }
+
+.xhat-mobile-menu__list { display: flex; flex-direction: column; gap: .5rem; margin: 0; padding: 0; list-style: none; }
+
+.xhat-mobile-menu__list > li > a,
+.xhat-mobile-menu__list .xhat-nav__toggle {
+	display: flex; align-items: center; gap: .25rem;
+	width: 100%;
+	padding: .25rem .75rem;
+	background: none; border: 0;
+	color: var(--xhat-ink);
+	font-family: inherit; font-size: 1rem; font-weight: 700;
+	text-align: left; cursor: pointer;
+}
+.xhat-mobile-menu__list > li > a:hover,
+.xhat-mobile-menu__list .xhat-nav__toggle:hover { color: var(--xhat-accent); }
+.xhat-mobile-menu__list .current-menu-item > a { color: var(--xhat-accent); }
+
+.xhat-mobile-menu__list .sub-menu {
+	display: flex; flex-direction: column; gap: .25rem;
+	margin: .25rem 0 0 .25rem; padding: 0 0 0 .75rem;
+	list-style: none;
+	border-left: 2px solid var(--xhat-accent);
+}
+.xhat-mobile-menu__list .sub-menu[hidden] { display: none; }
+.xhat-mobile-menu__list .sub-menu a {
+	display: flex; align-items: center; gap: .5rem;
+	padding: .375rem 0;
+	color: var(--xhat-body); font-size: .875rem; font-weight: 700;
+	transition: color .15s ease;
+}
+.xhat-mobile-menu__list .sub-menu a:hover { color: var(--xhat-accent); }
+.xhat-mobile-menu__list .sub-menu .xhat-nav__subdesc { display: none; }
+.xhat-mobile-menu__list .sub-menu .xhat-nav__subicon { width: 24px; height: 24px; border-radius: 6px; }
+.xhat-mobile-menu__list .sub-menu .xhat-nav__subicon svg { width: 13px; height: 13px; }
+.xhat-mobile-menu__list .sub-menu .xhat-nav__subtitle { color: inherit; font-size: .875rem; font-weight: 700; }
+
+.xhat-mobile-menu__actions {
+	display: flex; flex-direction: column; align-items: flex-start; gap: .5rem;
+	padding: .5rem .75rem 0;
+	border-top: 1px solid var(--xhat-border);
+}
+.xhat-mobile-menu__actions .xhat-header__addlink { display: inline-flex; padding: 0; }
+
+.xhat-mobile-menu__signup {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 8rem;
+	padding: .5rem .75rem;
+	background: var(--xhat-accent);
+	border-radius: 6px;
+	color: var(--xhat-on-accent); font-weight: 600; text-align: center;
+}
+@media (min-width: 768px) { .xhat-mobile-menu__signup { width: 10rem; } }
+.xhat-mobile-menu__signup:hover, .xhat-mobile-menu__signup:focus { background: var(--xhat-accent-dark); color: var(--xhat-on-accent); }
+
+/* =========================================================================
+   7. Search form
+   ========================================================================= */
+.xhat-searchform { display: flex; gap: .5rem; width: 100%; }
+.xhat-searchform__field {
+	flex: 1 1 auto; min-width: 0;
+	padding: .7rem 1.1rem;
+	background: var(--xhat-bg-soft);
+	border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius-pill);
+	color: var(--xhat-ink);
+	font-family: inherit; font-size: .9375rem;
+}
+.xhat-searchform__field::placeholder { color: var(--xhat-faint); }
+.xhat-searchform__field:focus { outline: none; border-color: var(--xhat-accent); box-shadow: 0 0 0 3px rgba(0, 255, 198, .14); }
+
+/* =========================================================================
+   8. Page hero / archive header
+   ========================================================================= */
+.xhat-pagehead {
+	position: relative;
+	padding: 3.25rem 0 2rem;
+	border-bottom: 1px solid var(--xhat-border);
+	background:
+		radial-gradient(80% 140% at 50% -40%, rgba(0, 255, 198, .13) 0%, transparent 65%);
+}
+.xhat-pagehead__title { margin: 0 0 .5rem; color: var(--xhat-ink); }
+.xhat-pagehead__sub { margin: 0; max-width: 60ch; color: var(--xhat-muted); font-size: 1.0625rem; }
+
+.xhat-breadcrumbs { margin-bottom: .9rem; color: var(--xhat-faint); font-size: .8125rem; }
+.xhat-breadcrumbs a { color: var(--xhat-muted); }
+.xhat-breadcrumbs a:hover { color: var(--xhat-accent); }
+.xhat-breadcrumbs span[aria-hidden] { margin: 0 .45rem; }
+
+/* =========================================================================
+   9. Section heading row
+   ========================================================================= */
+.xhat-sectionhead {
+	display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between;
+	gap: 1rem; margin-bottom: 1.75rem;
+}
+.xhat-sectionhead__title { margin: 0; }
+.xhat-sectionhead__link { font-size: .9375rem; font-weight: 600; }
+
+/* =========================================================================
+   10. Post grid + cards
+   ========================================================================= */
+.xhat-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+	gap: 1.75rem;
+}
+.xhat-grid--2 { grid-template-columns: repeat(auto-fill, minmax(380px, 1fr)); }
+
+.xhat-card {
+	position: relative;
+	display: flex; flex-direction: column; overflow: hidden;
+	background: var(--xhat-surface);
+	border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius-lg);
+	box-shadow: var(--xhat-shadow-sm);
+	transition: transform .3s ease, box-shadow .3s ease, border-color .3s ease;
+}
+.xhat-card:hover { transform: translateY(-4px); box-shadow: var(--xhat-shadow-lg); border-color: rgba(0, 255, 198, .35); }
+
+.xhat-card__media { position: relative; display: block; aspect-ratio: 16 / 10; overflow: hidden; background: var(--xhat-bg-soft); }
+.xhat-card__media img { width: 100%; height: 100%; object-fit: cover; transition: transform .45s ease; }
+.xhat-card:hover .xhat-card__media img { transform: scale(1.05); }
+
+.xhat-card__media--placeholder {
+	display: flex; align-items: center; justify-content: center;
+	background: linear-gradient(135deg, #15191700 0%, #0c0f0e 100%), #151917;
+	color: var(--xhat-faint);
+}
+.xhat-card__media--placeholder svg { width: 48px; height: 48px; opacity: .6; }
+
+
+
+.xhat-card__body { display: flex; flex-direction: column; flex: 1 1 auto; padding: 1.35rem; }
+
+.xhat-card__meta {
+	display: flex; flex-wrap: wrap; align-items: center; gap: .5rem .9rem;
+	margin-bottom: .7rem;
+	color: var(--xhat-muted); font-size: .8125rem;
+}
+.xhat-card__meta > span { display: inline-flex; align-items: center; gap: .35rem; }
+.xhat-card__meta svg { width: 14px; height: 14px; flex: 0 0 auto; opacity: .75; }
+
+.xhat-card__title { margin: 0 0 .6rem; font-size: 1.1875rem; line-height: 1.35; }
+.xhat-card__title a { color: var(--xhat-ink); }
+.xhat-card__title a:hover { color: var(--xhat-accent); }
+
+.xhat-card__excerpt { margin: 0 0 1.15rem; color: var(--xhat-body); font-size: .9375rem; }
+
+.xhat-card__footer {
+	display: flex; align-items: center; justify-content: space-between;
+	gap: 1rem; margin-top: auto;
+	padding-top: 1rem; border-top: 1px solid var(--xhat-border-soft);
+}
+.xhat-card__more { display: inline-flex; align-items: center; gap: .4rem; font-size: .875rem; font-weight: 600; }
+.xhat-card__more svg { width: 15px; height: 15px; transition: transform .2s ease; }
+.xhat-card__more:hover svg { transform: translateX(3px); }
+
+
+/* --- sticky post --- */
+.xhat-card--sticky { border-color: rgba(0, 255, 198, .35); }
+
+/* =========================================================================
+   11. Blog layout with sidebar
+   ========================================================================= */
+.xhat-layout { display: grid; gap: 2.5rem; padding: 2.5rem 0 3.5rem; }
+@media (min-width: 1024px) {
+	.xhat-layout { grid-template-columns: minmax(0, 1fr) 330px; gap: 3rem; align-items: start; }
+	.xhat-sidebar { position: sticky; top: calc(var(--xhat-header-h) + 1.5rem); }
+}
+
+.xhat-widget {
+	margin-bottom: 1.75rem; padding: 1.5rem;
+	background: var(--xhat-surface);
+	border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius-lg);
+}
+.xhat-widget:last-child { margin-bottom: 0; }
+.xhat-widget__title {
+	margin: 0 0 1rem; padding-bottom: .75rem;
+	border-bottom: 1px solid var(--xhat-border-soft);
+	color: var(--xhat-ink); font-size: 1rem;
+	letter-spacing: .01em; text-transform: uppercase;
+}
+.xhat-widget ul { margin: 0; padding: 0; list-style: none; }
+.xhat-widget > ul { max-height: 21rem; overflow-y: auto; overscroll-behavior: contain; padding-right: .4rem; scrollbar-width: thin; scrollbar-color: #2a3330 transparent; }
+.xhat-widget li + li { margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--xhat-border-soft); }
+.xhat-widget li a { color: var(--xhat-body); font-size: .9375rem; }
+.xhat-widget li a:hover { color: var(--xhat-accent); }
+.xhat-widget .children, .xhat-widget .sub-menu { margin-top: .6rem; padding-left: 1rem; }
+
+.xhat-widget--cta {
+	background:
+		radial-gradient(120% 90% at 0% 0%, rgba(0, 255, 198, .16) 0%, transparent 60%),
+		linear-gradient(160deg, #0d1413 0%, var(--xhat-dark) 100%);
+	border-color: rgba(0, 255, 198, .22); color: rgba(255, 255, 255, .85);
+}
+.xhat-widget--cta .xhat-widget__title { color: #fff; border-bottom-color: rgba(255, 255, 255, .15); }
+.xhat-widget--cta p { color: rgba(255, 255, 255, .8); font-size: .9375rem; }
+
+/* recent post rows in sidebar */
+.xhat-minipost { display: flex; gap: .85rem; align-items: flex-start; }
+.xhat-minipost__thumb { flex: 0 0 72px; width: 72px; height: 56px; overflow: hidden; border-radius: var(--xhat-radius-sm); background: var(--xhat-bg-soft); }
+.xhat-minipost__thumb img { width: 100%; height: 100%; object-fit: cover; }
+.xhat-minipost__title { margin: 0 0 .2rem; font-size: .875rem; font-weight: 600; line-height: 1.4; }
+.xhat-minipost__title a { color: var(--xhat-ink); }
+.xhat-minipost__title a:hover { color: var(--xhat-accent); }
+.xhat-minipost__date { color: var(--xhat-faint); font-size: .75rem; }
+
+/* tag cloud */
+.xhat-widget .tagcloud { display: flex; flex-wrap: wrap; gap: .45rem; }
+.xhat-widget .tagcloud a {
+	padding: .35rem .75rem;
+	background: var(--xhat-bg-soft); border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius-pill);
+	font-size: .8125rem !important;
+}
+.xhat-widget .tagcloud a:hover { background: var(--xhat-accent); color: var(--xhat-on-accent); border-color: var(--xhat-accent); }
+
+/* -------------------------------------------------------------------------
+   Core / block widgets (Appearance -> Widgets)
+   Makes WordPress's own Search, Recent Posts, Categories, Archives and
+   Recent Comments blocks match the theme instead of using browser defaults.
+   ------------------------------------------------------------------------- */
+
+/* --- widget headings (block widgets render their own h2) --- */
+.xhat-widget .wp-block-heading,
+.xhat-widget > .wp-block-group > .wp-block-group__inner-container > h2 {
+	margin: 0 0 1rem; padding-bottom: .75rem;
+	border-bottom: 1px solid var(--xhat-border-soft);
+	color: var(--xhat-ink);
+	font-size: 1rem; font-weight: 700;
+	letter-spacing: .01em; text-transform: uppercase;
+}
+
+.xhat-widget .wp-block-group,
+.xhat-widget .wp-block-group__inner-container { margin: 0; }
+
+/* --- search block --- */
+.xhat-widget .wp-block-search { margin: 0; }
+
+.xhat-widget .wp-block-search__label {
+	display: block; margin: 0 0 .75rem; padding-bottom: .75rem;
+	border-bottom: 1px solid var(--xhat-border-soft);
+	color: var(--xhat-ink);
+	font-size: 1rem; font-weight: 700;
+	letter-spacing: .01em; text-transform: uppercase;
+}
+
+.xhat-widget .wp-block-search__inside-wrapper { display: flex; gap: .5rem; }
+
+.xhat-widget .wp-block-search__input {
+	flex: 1 1 auto; min-width: 0;
+	padding: .7rem 1.1rem;
+	background: var(--xhat-bg-soft);
+	border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius-pill);
+	color: var(--xhat-ink);
+	font-family: inherit; font-size: .9375rem;
+}
+.xhat-widget .wp-block-search__input::placeholder { color: var(--xhat-faint); }
+.xhat-widget .wp-block-search__input:focus {
+	outline: none; border-color: var(--xhat-accent);
+	box-shadow: 0 0 0 3px rgba(0, 255, 198, .14);
+}
+
+/* the brand mint button, replacing the default near-black one */
+.xhat-widget .wp-block-search__button,
+.xhat-widget .wp-block-search .wp-element-button {
+	flex: 0 0 auto;
+	margin: 0; padding: .7rem 1.35rem;
+	background: var(--xhat-accent);
+	border: 1px solid transparent;
+	border-radius: var(--xhat-radius-pill);
+	color: var(--xhat-on-accent);
+	font-family: inherit; font-size: .9375rem; font-weight: 600; line-height: 1.2;
+	cursor: pointer;
+	transition: background .2s ease, transform .2s ease;
+}
+.xhat-widget .wp-block-search__button:hover,
+.xhat-widget .wp-block-search .wp-element-button:hover {
+	background: var(--xhat-accent-dark); color: var(--xhat-on-accent); transform: translateY(-1px);
+}
+
+/* --- list-style blocks --- */
+.xhat-widget .wp-block-latest-posts__list,
+.xhat-widget .wp-block-categories-list,
+.xhat-widget .wp-block-archives-list,
+.xhat-widget .wp-block-page-list {
+	margin: 0; padding: 0; list-style: none;
+}
+
+.xhat-widget .wp-block-latest-posts__list li,
+.xhat-widget .wp-block-categories-list li,
+.xhat-widget .wp-block-archives-list li { margin: 0; }
+
+.xhat-widget .wp-block-latest-posts__list li + li,
+.xhat-widget .wp-block-categories-list li + li,
+.xhat-widget .wp-block-archives-list li + li {
+	margin-top: .6rem; padding-top: .6rem;
+	border-top: 1px solid var(--xhat-border-soft);
+}
+
+.xhat-widget .wp-block-latest-posts__list a,
+.xhat-widget .wp-block-categories-list a,
+.xhat-widget .wp-block-archives-list a {
+	color: var(--xhat-body);
+	font-size: .9375rem; font-weight: 500; line-height: 1.45;
+	text-decoration: none;
+}
+.xhat-widget .wp-block-latest-posts__list a:hover,
+.xhat-widget .wp-block-categories-list a:hover,
+.xhat-widget .wp-block-archives-list a:hover { color: var(--xhat-accent); }
+
+.xhat-widget .wp-block-latest-posts__post-date,
+.xhat-widget .wp-block-latest-posts__post-author {
+	display: block; margin-top: .2rem;
+	color: var(--xhat-faint); font-size: .75rem;
+}
+.xhat-widget .wp-block-latest-posts__post-excerpt {
+	margin-top: .35rem; color: var(--xhat-muted); font-size: .8125rem;
+}
+.xhat-widget .wp-block-latest-posts__featured-image img {
+	margin-bottom: .5rem; border-radius: var(--xhat-radius-sm);
+}
+
+/* --- latest comments --- */
+.xhat-widget .wp-block-latest-comments { margin: 0; padding: 0; list-style: none; }
+.xhat-widget .wp-block-latest-comments__comment { margin: 0; font-size: .9375rem; line-height: 1.5; }
+.xhat-widget .wp-block-latest-comments__comment + .wp-block-latest-comments__comment {
+	margin-top: .6rem; padding-top: .6rem; border-top: 1px solid var(--xhat-border-soft);
+}
+.xhat-widget .wp-block-latest-comments__comment-meta { color: var(--xhat-body); }
+.xhat-widget .wp-block-latest-comments__comment-meta a { color: var(--xhat-ink); font-weight: 600; }
+.xhat-widget .wp-block-latest-comments__comment-meta a:hover { color: var(--xhat-accent); }
+.xhat-widget .wp-block-latest-comments__comment-date { color: var(--xhat-faint); font-size: .75rem; }
+.xhat-widget .no-comments { color: var(--xhat-muted); font-size: .9375rem; }
+
+/* --- long lists scroll instead of stretching the sidebar --- */
+.xhat-widget .wp-block-latest-posts__list,
+.xhat-widget .wp-block-categories-list,
+.xhat-widget .wp-block-archives-list,
+.xhat-widget .wp-block-latest-comments,
+.xhat-widget__list--scroll {
+	max-height: 21rem;
+	overflow-y: auto;
+	overscroll-behavior: contain;
+	scrollbar-width: thin;
+	scrollbar-color: #2a3330 transparent;
+}
+
+/* keep the text clear of the scrollbar once one appears */
+.xhat-widget .wp-block-latest-posts__list,
+.xhat-widget .wp-block-categories-list,
+.xhat-widget .wp-block-archives-list,
+.xhat-widget .wp-block-latest-comments,
+.xhat-widget__list--scroll { padding-right: .4rem; }
+
+.xhat-widget ::-webkit-scrollbar { width: 6px; }
+.xhat-widget ::-webkit-scrollbar-track { background: transparent; }
+.xhat-widget ::-webkit-scrollbar-thumb {
+	background: #2a3330; border-radius: 999px;
+}
+.xhat-widget ::-webkit-scrollbar-thumb:hover { background: var(--xhat-accent); }
+
+
+/* =========================================================================
+   12. Single post
+   ========================================================================= */
+.xhat-single { padding-bottom: 3.5rem; }
+
+.xhat-single__head { padding: 2.25rem 0 1.5rem; }
+.xhat-single__title { margin: 0 0 1rem; color: var(--xhat-ink); font-size: clamp(1.625rem, 1.1rem + 2.4vw, 2.625rem); }
+.xhat-single__lead { margin: 0 0 1.5rem; max-width: 65ch; color: var(--xhat-muted); font-size: 1.0625rem; }
+
+.xhat-single__meta {
+	display: flex; flex-wrap: wrap; align-items: center; gap: .6rem 1.5rem;
+	padding: 1rem 0;
+	border-top: 1px solid var(--xhat-border);
+	border-bottom: 1px solid var(--xhat-border);
+	color: var(--xhat-muted); font-size: .875rem;
+}
+.xhat-single__meta > span, .xhat-single__meta > a { display: inline-flex; align-items: center; gap: .45rem; }
+.xhat-single__meta svg { width: 15px; height: 15px; opacity: .75; }
+.xhat-single__meta strong { color: var(--xhat-ink); font-weight: 600; }
+
+.xhat-single__media { margin: 1.75rem 0 2.5rem; }
+.xhat-single__media img {
+	width: 100%;
+	max-height: 440px;            /* stop tall photos swamping the article */
+	object-fit: cover;
+	border-radius: var(--xhat-radius-lg);
+	box-shadow: var(--xhat-shadow);
+}
+
+/* --- article body typography --- */
+.xhat-content { color: var(--xhat-body); font-size: 1.0625rem; line-height: 1.8; }
+.xhat-content { padding-bottom: .5rem; }
+.xhat-content > * + * { margin-top: 1.25rem; }
+.xhat-content h2 { margin: 2.5rem 0 .85rem; padding-top: .35rem; font-size: clamp(1.3rem, 1rem + 1vw, 1.625rem); }
+.xhat-content h3 { margin: 2rem 0 .7rem; font-size: clamp(1.125rem, 1rem + .5vw, 1.3125rem); }
+.xhat-content h4 { margin: 1.5rem 0 .6rem; }
+.xhat-content ul, .xhat-content ol { padding-left: 1.35rem; }
+.xhat-content li + li { margin-top: .5rem; }
+.xhat-content li::marker { color: var(--xhat-accent); }
+.xhat-content a { text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
+.xhat-content img, .xhat-content .wp-block-image { border-radius: var(--xhat-radius); }
+.xhat-content > p:first-of-type { font-size: 1.125rem; }
+.xhat-content .alignleft  { float: left;  margin: .35rem 1.5rem 1rem 0; }
+.xhat-content .alignright { float: right; margin: .35rem 0 1rem 1.5rem; }
+.xhat-content .aligncenter { margin-inline: auto; }
+.xhat-content .wp-caption { max-width: 100%; }
+
+/* -------------------------------------------------------------------------
+   Editor content safety net
+   Anything an author can insert from the block editor is styled here, so a
+   post never falls back to unstyled browser defaults or breaks the layout.
+   ------------------------------------------------------------------------- */
+
+/* long URLs / unbroken strings must never push the column wider */
+.xhat-content { overflow-wrap: break-word; word-wrap: break-word; }
+
+/* floated images must not run into whatever follows */
+.xhat-content::after { content: ""; display: table; clear: both; }
+.xhat-content h2,
+.xhat-content h3,
+.xhat-content .wp-block-buttons,
+.xhat-content .wp-block-columns,
+.xhat-content .wp-block-table,
+.xhat-content .wp-block-separator,
+.xhat-content .wp-block-details,
+.xhat-content hr { clear: both; }
+
+/* --- buttons --- */
+.xhat-content .wp-block-buttons {
+	display: flex; flex-wrap: wrap; gap: .75rem;
+	margin: 1.75rem 0;
+}
+.xhat-content .wp-block-button { margin: 0; }
+.xhat-content .wp-block-button__link {
+	display: inline-flex; align-items: center; justify-content: center;
+	padding: .75rem 1.75rem;
+	background: var(--xhat-accent);
+	border: 1px solid transparent;
+	border-radius: var(--xhat-radius-pill) !important;
+	color: var(--xhat-on-accent);
+	font-size: .9375rem; font-weight: 600; line-height: 1.2;
+	text-decoration: none;
+	transition: background .2s ease, color .2s ease;
+}
+.xhat-content .wp-block-button__link:hover,
+.xhat-content .wp-block-button__link:focus { background: var(--xhat-accent-dark); color: var(--xhat-on-accent); }
+
+.xhat-content .wp-block-button.is-style-outline .wp-block-button__link {
+	background: transparent; color: var(--xhat-accent); border-color: var(--xhat-accent);
+}
+.xhat-content .wp-block-button.is-style-outline .wp-block-button__link:hover {
+	background: var(--xhat-accent); color: var(--xhat-on-accent);
+}
+
+/* --- drop cap --- */
+.xhat-content p.has-drop-cap::first-letter {
+	float: left;
+	margin: .06em .12em 0 0;
+	color: var(--xhat-accent);
+	font-size: 3.4em; font-weight: 700; line-height: .78;
+}
+
+/* --- tables: scroll instead of squashing on small screens --- */
+.xhat-content .wp-block-table { margin: 1.75rem 0; overflow-x: auto; }
+.xhat-content .wp-block-table table { min-width: 34rem; margin: 0; }
+.xhat-content .wp-block-table.is-style-stripes tbody tr:nth-child(odd) { background: var(--xhat-bg-soft); }
+
+/* --- captions (classic + block editor) --- */
+.xhat-content figcaption,
+.xhat-content .wp-element-caption {
+	margin-top: .6rem;
+	color: var(--xhat-muted); font-size: .8125rem; text-align: center;
+}
+
+/* --- columns --- */
+.xhat-content .wp-block-columns {
+	display: flex; flex-wrap: wrap; gap: 1.5rem;
+	margin: 1.75rem 0;
+}
+.xhat-content .wp-block-column { flex: 1 1 240px; min-width: 0; }
+.xhat-content .wp-block-column > *:first-child { margin-top: 0; }
+
+/* --- details / accordion --- */
+.xhat-content .wp-block-details,
+.xhat-content details {
+	margin: 1.5rem 0; padding: 1rem 1.25rem;
+	background: var(--xhat-bg-soft);
+	border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius);
+}
+.xhat-content summary {
+	cursor: pointer;
+	color: var(--xhat-ink); font-weight: 600;
+}
+.xhat-content details[open] summary { margin-bottom: .75rem; }
+
+/* --- embeds stay responsive --- */
+.xhat-content .wp-block-embed { margin: 1.75rem 0; }
+.xhat-content .wp-block-embed__wrapper { position: relative; }
+.xhat-content .wp-block-embed.is-type-video .wp-block-embed__wrapper {
+	aspect-ratio: 16 / 9;
+}
+.xhat-content .wp-block-embed.is-type-video .wp-block-embed__wrapper iframe {
+	position: absolute; inset: 0; width: 100%; height: 100%;
+	border: 0; border-radius: var(--xhat-radius);
+}
+.xhat-content iframe { max-width: 100%; }
+
+/* --- definition lists --- */
+.xhat-content dl { margin: 1.5rem 0; }
+.xhat-content dt { margin-top: .9rem; color: var(--xhat-ink); font-weight: 700; }
+.xhat-content dd { margin: .25rem 0 0 1.25rem; }
+
+/* --- misc inline elements --- */
+.xhat-content kbd {
+	padding: .12em .45em;
+	background: var(--xhat-bg-soft);
+	border: 1px solid var(--xhat-border); border-bottom-width: 2px;
+	border-radius: 5px;
+	font-size: .85em;
+}
+.xhat-content mark { padding: .05em .25em; background: var(--xhat-accent-soft); border-radius: 3px; color: var(--xhat-ink); }
+.xhat-content abbr[title] { text-decoration: underline dotted; cursor: help; }
+.xhat-content address { font-style: normal; color: var(--xhat-body); }
+
+/* --- editor colour / alignment / size classes --- */
+.xhat-content .has-text-align-center { text-align: center; }
+.xhat-content .has-text-align-right  { text-align: right; }
+.xhat-content .has-text-align-left   { text-align: left; }
+.xhat-content p.has-background { padding: 1.25rem; border-radius: var(--xhat-radius); }
+.xhat-content .has-small-font-size  { font-size: .875rem; }
+.xhat-content .has-large-font-size  { font-size: 1.375rem; line-height: 1.4; }
+.xhat-content .has-x-large-font-size { font-size: 1.75rem; line-height: 1.3; }
+
+/* --- pullquote / verse / preformatted --- */
+.xhat-content .wp-block-pullquote {
+	margin: 2rem 0; padding: 1.5rem 0;
+	border-top: 2px solid var(--xhat-accent); border-bottom: 2px solid var(--xhat-accent);
+	text-align: center;
+}
+/* the base blockquote look must not leak into a pullquote */
+.xhat-content .wp-block-pullquote blockquote {
+	margin: 0; padding: 0;
+	background: none;
+	border: 0; border-radius: 0;
+}
+.xhat-content .wp-block-pullquote p { font-size: 1.25rem; font-style: italic; }
+.xhat-content .wp-block-pullquote cite {
+	display: block; margin-top: .6rem;
+	color: var(--xhat-muted); font-size: .875rem; font-style: normal;
+}
+.xhat-content .wp-block-verse { font-family: inherit; white-space: pre-wrap; }
+.xhat-content .wp-block-preformatted { white-space: pre-wrap; }
+
+/* --- galleries / media-text / cover must not overflow --- */
+.xhat-content .wp-block-gallery { margin: 1.75rem 0; }
+.xhat-content .wp-block-media-text { margin: 1.75rem 0; }
+.xhat-content .wp-block-cover { margin: 1.75rem 0; border-radius: var(--xhat-radius); overflow: hidden; }
+
+/* --- separators / spacers --- */
+.xhat-content .wp-block-separator { max-width: 100%; }
+.xhat-content .wp-block-spacer { max-width: 100%; }
+
+@media (max-width: 719px) {
+	/* floats on a narrow column just waste space */
+	.xhat-content .alignleft,
+	.xhat-content .alignright {
+		float: none; display: block;
+		margin: 1.25rem auto;
+	}
+	.xhat-content .wp-block-image.alignleft,
+	.xhat-content .wp-block-image.alignright { width: auto !important; }
+}
+
+/* tags + share */
+.xhat-single__footer { margin-top: 2.5rem; padding-top: 1.5rem; border-top: 1px solid var(--xhat-border); }
+.xhat-tags { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem; margin-bottom: 1.5rem; }
+.xhat-tags__label { margin-right: .25rem; color: var(--xhat-muted); font-size: .8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.xhat-tags a {
+	padding: .35rem .8rem;
+	background: var(--xhat-bg-soft); border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius-pill);
+	color: var(--xhat-body); font-size: .8125rem;
+}
+.xhat-tags a:hover { background: var(--xhat-accent); color: var(--xhat-on-accent); border-color: var(--xhat-accent); }
+
+.xhat-share { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.xhat-share__label { margin-right: .35rem; }
+.xhat-share__label { color: var(--xhat-muted); font-size: .8125rem; font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+.xhat-share a {
+	display: inline-flex; align-items: center; justify-content: center;
+	width: 38px; height: 38px;
+	background: var(--xhat-bg-soft); border: 1px solid var(--xhat-border);
+	border-radius: 50%; color: var(--xhat-ink);
+	transition: all .25s ease;
+}
+.xhat-share a:hover { background: var(--xhat-accent); border-color: var(--xhat-accent); color: var(--xhat-on-accent); transform: translateY(-2px); }
+.xhat-share svg { width: 17px; height: 17px; fill: currentColor; }
+
+/* author box */
+
+/* post navigation */
+.xhat-postnav { display: grid; gap: 1rem; margin-top: 2.5rem; }
+@media (min-width: 720px) { .xhat-postnav { grid-template-columns: 1fr 1fr; } }
+.xhat-postnav__item {
+	display: block; padding: 1.25rem;
+	background: var(--xhat-surface); border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius);
+	transition: border-color .25s ease, box-shadow .25s ease, transform .25s ease;
+}
+.xhat-postnav__item:hover { border-color: var(--xhat-accent); box-shadow: var(--xhat-shadow); transform: translateY(-2px); }
+.xhat-postnav__label { display: block; margin-bottom: .35rem; color: var(--xhat-accent); font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+.xhat-postnav__title { display: block; color: var(--xhat-ink); font-size: .9375rem; font-weight: 600; line-height: 1.45; }
+.xhat-postnav__item--next { text-align: right; }
+
+/* related */
+.xhat-related { margin-top: 3.5rem; padding-top: 2.5rem; border-top: 1px solid var(--xhat-border); }
+
+/* reading progress */
+.xhat-progress {
+	position: fixed; top: 0; left: 0; z-index: 1000;
+	width: 0; height: 3px; background: var(--xhat-accent);
+	transition: width .1s linear;
+}
+
+/* =========================================================================
+   13. Pagination
+   ========================================================================= */
+.xhat-pagination { margin-top: 2.75rem; }
+.xhat-pagination .nav-links { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: .45rem; }
+.xhat-pagination .page-numbers {
+	display: inline-flex; align-items: center; justify-content: center;
+	min-width: 42px; height: 42px; padding: 0 .85rem;
+	background: var(--xhat-surface); border: 1px solid var(--xhat-border);
+	border-radius: var(--xhat-radius-sm);
+	color: var(--xhat-ink); font-size: .9375rem; font-weight: 600;
+	transition: all .2s ease;
+}
+.xhat-pagination .page-numbers:hover { background: var(--xhat-accent-soft); border-color: var(--xhat-accent); color: var(--xhat-accent); }
+.xhat-pagination .page-numbers.current { background: var(--xhat-accent); border-color: var(--xhat-accent); color: var(--xhat-on-accent); }
+.xhat-pagination .page-numbers.dots { background: none; border-color: transparent; }
+.xhat-pagination .page-numbers.prev,
+.xhat-pagination .page-numbers.next { padding: 0 1.1rem; }
+
+/* =========================================================================
+   14. 404 / no results
+   ========================================================================= */
+.xhat-empty { padding: 3.5rem 0; text-align: center; }
+.xhat-empty__code { margin: 0; color: var(--xhat-accent); font-size: clamp(3.5rem, 2rem + 8vw, 6rem); font-weight: 800; line-height: 1; letter-spacing: -.04em; }
+.xhat-empty__title { margin: .75rem 0; }
+.xhat-empty p { max-width: 48ch; margin-inline: auto; color: var(--xhat-muted); }
+.xhat-empty__actions { display: flex; flex-wrap: wrap; justify-content: center; gap: .75rem; margin-top: 1.75rem; }
+.xhat-empty .xhat-searchform { max-width: 420px; margin: 1.75rem auto 0; }
+
+/* =========================================================================
+   15. WordPress core / alignment classes
+   ========================================================================= */
+.alignleft   { float: left;  margin-right: 1.5rem; }
+.alignright  { float: right; margin-left: 1.5rem; }
+.aligncenter { display: block; margin-inline: auto; }
+.alignwide   { max-width: min(1120px, 100%); margin-inline: auto; }
+.alignfull   { width: 100%; max-width: none; }
+.wp-caption-text { color: var(--xhat-muted); font-size: .8125rem; text-align: center; }
+.sticky, .gallery-caption, .bypostauthor { display: block; }
+.wp-block-embed, .wp-block-embed__wrapper { margin: 1.75rem 0; }
+.wp-block-embed iframe { width: 100%; border-radius: var(--xhat-radius); }
+.wp-block-button__link { border-radius: var(--xhat-radius-pill) !important; }
+.wp-block-separator { border-top: 1px solid var(--xhat-border); }
+
+/* admin bar offset for sticky header */
+body.admin-bar .xhat-header { top: 32px; }
+@media screen and (max-width: 782px) { body.admin-bar .xhat-header { top: 46px; } }
+
+/* =========================================================================
+   16. Responsive
+   ========================================================================= */
+@media (max-width: 719px) {
+	.xhat-grid { grid-template-columns: 1fr; gap: 1.35rem; }
+	.xhat-card__body { padding: 1.15rem; }
+	.xhat-single__meta { gap: .5rem 1rem; font-size: .8125rem; }
+	.xhat-postnav__item--next { text-align: left; }
+}
+
+/* =========================================================================
+   17. Motion / print
+   ========================================================================= */
+.xhat-reveal { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+.xhat-reveal.is-visible { opacity: 1; transform: none; }
+
+@media (prefers-reduced-motion: reduce) {
+	html { scroll-behavior: auto; }
+	*, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+	.xhat-reveal { opacity: 1; transform: none; }
+}
+
+@media print {
+	.xhat-header, .xhat-sidebar, .xhat-share, .xhat-postnav,
+	.xhat-related, .xhat-progress, .xhat-burger { display: none !important; }
+	body { color: #000; font-size: 12pt; }
+	.xhat-layout { grid-template-columns: 1fr; }
+	a { color: #000; text-decoration: underline; }
+}
